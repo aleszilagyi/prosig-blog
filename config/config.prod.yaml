@@ -1,0 +1,12 @@
+app:
+  port: 8080
+  env: prod
+
+db:
+  port: 5432
+  name: postgres
+  sslmode: require
+
+logger:
+  level: info
+  encoding: json

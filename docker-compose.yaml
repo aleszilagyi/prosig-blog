@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: blog_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./test/local/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - blog-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 2s
+      retries: 10
+
+  blog-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: blog-service
+    environment:
+      APP_DB_HOST: postgres
+      APP_ENV: local
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - blog-network
+
+networks:
+  blog-network:
+    driver: bridge
